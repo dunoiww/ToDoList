@@ -23,17 +23,44 @@ struct ProfileView: View {
         .onAppear {
             viewModel.fetchUser()
         }
+        .fullScreenCover(
+          isPresented: $viewModel.showingPreview,
+          onDismiss: { viewModel.fetchUser() }
+        ) {
+          PreviewAvatarView()
+        }
     }
     
     @ViewBuilder
     func profile(user: User) -> some View {
         //avatar
-        Image(systemName: "person.circle")
-            .resizable()
-            .scaledToFit()
-            .foregroundColor(.blue)
-            .frame(width: 125, height: 125)
-            .padding()
+        
+        Button {
+            viewModel.showingPreview.toggle()
+        } label: {
+            if user.avatarURL != "" {
+                AsyncImage(url: URL(string: user.avatarURL)) { image in
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 256, height: 256)
+                        .cornerRadius(128)
+                        .overlay(RoundedRectangle(cornerRadius: 128)
+                            .stroke(Color.black, lineWidth: 3)
+                        )
+                } placeholder: {
+                    ProgressView()
+                }
+            } else {
+                Image(systemName: "person.circle")
+                    .resizable()
+                    .scaledToFit()
+                    .foregroundColor(.blue)
+                    .frame(width: 128, height: 128)
+                    .padding()
+            }
+            
+        }
         
         //info
         VStack(alignment: .leading) {
@@ -60,14 +87,18 @@ struct ProfileView: View {
         }
         .padding()
         
+        Spacer()
+        
         //button sign out
         Button("Log out") {
             viewModel.logOut()
         }
-        .tint(.red)
+        .tint(.white)
         .padding()
+        .frame(width: 300)
+        .background(Color(hue: 1.0, saturation: 0.68, brightness: 0.981))
+        .cornerRadius(16)
         
-        Spacer()
     }
 }
 

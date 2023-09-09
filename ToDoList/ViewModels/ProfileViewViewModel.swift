@@ -7,12 +7,14 @@
 
 import FirebaseAuth
 import FirebaseFirestore
+import FirebaseStorage
 import Foundation
 
 class ProfileViewViewModel: ObservableObject {
     init() {}
     
     @Published var user: User? = nil
+    @Published var showingPreview = false
     
     func fetchUser() {
         guard let userId = Auth.auth().currentUser?.uid else {
@@ -32,11 +34,14 @@ class ProfileViewViewModel: ObservableObject {
                     self?.user = User(id: data["id"] as? String ?? "",
                                       name: data["name"] as? String ?? "",
                                       email: data["email"] as? String ?? "",
-                                      joined: data["joined"] as? TimeInterval ?? 0)
+                                      joined: data["joined"] as? TimeInterval ?? 0,
+                                      avatarURL: data["avatarURL"] as? String ?? "")
                 }
                 //sử dụng DispatchQueue.main.async chỗ này đảm bảo rằng việc tải dữ liệu từ db sẽ không cản trở luồng làm việc hiện tại, luồng hiện tại có thể tiếp tục công việc trong khi chờ user được tải dữ liệu từ db
             }
     }
+    
+    
     
     func logOut() {
         do {
